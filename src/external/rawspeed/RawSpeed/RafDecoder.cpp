@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "RafDecoder.h"
 
+#include "FujiDecompressor.h"
+
 /*
     RawSpeed - RAW file decoder.
 
@@ -95,7 +97,13 @@ RawImage RafDecoder::decodeRawInternal() {
   iPoint2D pos(0, 0);
 
   if (count*8/(width*height) < 10) {
-    ThrowRDE("Don't know how to decode compressed images");
+    mRaw->metadata.mode = "compressed";
+
+    FujiDecompressor fujiDecompress (mFile, mRaw, off);
+    fujiDecompress.parse_fuji_compressed_header();
+    fujiDecompress.fuji_compressed_load_raw();
+
+    return mRaw;
   } else if (double_width) {
     Decode16BitRawUnpacked(input, width*2, height);
   } else if (mRootIFD->endian == big) {
@@ -145,7 +153,9 @@ void RafDecoder::decodeMetaDataInternal(CameraMetaData *meta) {
   // to rotate the image for SuperCCD cameras we do everything ourselves
   TrimSpaces(make);
   TrimSpaces(model);
-  Camera *cam = meta->getCamera(make, model, "");
+  //Camera *cam = meta->getCamera(make, model, "");
+  // TODO
+  Camera *cam = meta->getCamera(make, model, mRaw->metadata.mode);
   if (!cam)
     ThrowRDE("RAF Meta Decoder: Couldn't find camera");
 

@@ -56,6 +56,7 @@ FILE(GLOB RAWSPEED_SOURCES
         "RawSpeed/FileMap.cpp"
         "RawSpeed/FileReader.cpp"
         "RawSpeed/FileWriter.cpp"
+        "RawSpeed/FujiDecompressor.cpp"
         "RawSpeed/HasselbladDecompressor.cpp"
         "RawSpeed/IOException.cpp"
         "RawSpeed/KdcDecoder.cpp"

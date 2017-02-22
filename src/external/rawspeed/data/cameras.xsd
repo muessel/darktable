@@ -429,6 +429,7 @@
       <xs:enumeration value="sNEF-uncompressed"/>
       <xs:enumeration value="sRaw1"/>
       <xs:enumeration value="sRaw2"/>
+      <xs:enumeration value="compressed"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="CameraTypeSupportedType">
