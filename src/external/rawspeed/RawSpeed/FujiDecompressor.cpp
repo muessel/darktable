@@ -126,9 +126,11 @@ void FujiDecompressor::fuji_fill_buffer (struct fuji_compressed_block *info)
             //fseek (info->input, info->cur_buf_offset, SEEK_SET);
             //info->cur_buf_size = fread (info->cur_buf, 1, std::min (info->max_read_size, FUJI_BUF_SIZE), info->input);
             info->cur_buf_size = std::min (info->max_read_size, FUJI_BUF_SIZE);
-            memcpy(info->cur_buf,
-            	   mFile->getData(info->cur_buf_offset, info->cur_buf_size),
-				   info->cur_buf_size);
+	    if (info->cur_buf_size > 0) {
+                memcpy(info->cur_buf,
+                       mFile->getData(info->cur_buf_offset, info->cur_buf_size),
+		                      info->cur_buf_size);
+            }
 
 
         }
