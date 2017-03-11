@@ -246,26 +246,30 @@ void FujiDecompressor::copy_line_to_xtrans (struct fuji_compressed_block* info, 
     }
 }
 
-/*
 void FujiDecompressor::copy_line_to_bayer (struct fuji_compressed_block *info, int cur_line, int cur_block, int cur_block_width)
 {
     ushort *lineBufB[3];
     ushort *lineBufG[6];
     ushort *lineBufR[3];
-    unsigned pixel_count;
+    // unsigned pixel_count;
+    int pixel_count;
     ushort *line_buf;
 
-    int fuji_bayer[2][2];
+	// TODO: check CFA
+    int fuji_bayer[2][2] = {{0,1},{1,2}};
 
+    /*
     for (int r = 0; r < 2; r++)
         for (int c = 0; c < 2; c++) {
             fuji_bayer[r][c] = FC (r, c);    // We'll downgrade G2 to G below
         }
+    */
 
-    int offset = fuji_block_width * cur_block + 6 * raw_width * cur_line;
-    // TODO
+    //int offset = fuji_block_width * cur_block + 6 * raw_width * cur_line;
     //ushort *raw_block_data = raw_image + offset;
-    ushort* *raw_block_data = mImg.get()->getData() + offset;
+    // TODO
+    ushort* raw_block_data = (ushort*)  mImg->getData( fuji_block_width * cur_block , 6 * cur_line);
+
     int row_count = 0;
 
     for (int i = 0; i < 3; i++) {
@@ -305,7 +309,7 @@ void FujiDecompressor::copy_line_to_bayer (struct fuji_compressed_block *info, i
         raw_block_data += raw_width;
     }
 }
-*/
+
 
 #define fuji_quant_gradient(i,v1,v2) (9*i->q_table[i->q_point[4]+(v1)] + i->q_table[i->q_point[4]+(v2)])
 
@@ -739,7 +743,6 @@ void FujiDecompressor::xtrans_decode_block (struct fuji_compressed_block* info, 
     }
 }
 
-/*
 void FujiDecompressor::fuji_bayer_decode_block (struct fuji_compressed_block *info, const struct fuji_compressed_params *params,
                                     int cur_line)
 {
@@ -884,7 +887,7 @@ void FujiDecompressor::fuji_bayer_decode_block (struct fuji_compressed_block *in
     	ThrowRDE("fuji decode bayer block");
     }
 }
-*/
+
 
 void FujiDecompressor::fuji_decode_strip (const struct fuji_compressed_params* info_common, int cur_block, uint64 raw_offset, unsigned dsize)
 {
@@ -912,9 +915,9 @@ void FujiDecompressor::fuji_decode_strip (const struct fuji_compressed_params* i
         if (fuji_raw_type == 16) {
             xtrans_decode_block (&info, info_common, cur_line);
         } else {
-            // fuji_bayer_decode_block (&info, info_common, cur_line);
+            fuji_bayer_decode_block (&info, info_common, cur_line);
         	// TODO
-        	ThrowRDE("fuji_bayer_decode_block");
+        	//ThrowRDE("fuji_bayer_decode_block");
 
         }
 
@@ -926,9 +929,9 @@ void FujiDecompressor::fuji_decode_strip (const struct fuji_compressed_params* i
         if (fuji_raw_type == 16) {
             copy_line_to_xtrans (&info, cur_line, cur_block, cur_block_width);
         } else {
-            //copy_line_to_bayer (&info, cur_line, cur_block, cur_block_width);
+            copy_line_to_bayer (&info, cur_line, cur_block, cur_block_width);
         	// TODO
-        	ThrowRDE("copy_line_to_bayer");
+        	//ThrowRDE("copy_line_to_bayer");
         }
 
         for (int i = 0; i < 3; i++) {

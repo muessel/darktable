@@ -97,7 +97,7 @@ private:
   void init_fuji_block (struct fuji_compressed_block* info, const struct fuji_compressed_params *params, uint64 raw_offset, unsigned dsize);
   void fuji_fill_buffer (struct fuji_compressed_block *info);
   void copy_line_to_xtrans (struct fuji_compressed_block* info, int cur_line, int cur_block, int cur_block_width);
-  // void copy_line_to_bayer (struct fuji_compressed_block *info, int cur_line, int cur_block, int cur_block_width);
+  void copy_line_to_bayer (struct fuji_compressed_block *info, int cur_line, int cur_block, int cur_block_width);
   void fuji_zerobits (struct fuji_compressed_block* info, int *count);
   void fuji_read_code (struct fuji_compressed_block* info, int *data, int bits_to_read);
   int bitDiff (int value1, int value2);
@@ -109,7 +109,7 @@ private:
   void fuji_extend_green (ushort *linebuf[_ltotal], int line_width);
   void fuji_extend_blue (ushort *linebuf[_ltotal], int line_width);
   void xtrans_decode_block (struct fuji_compressed_block* info, const struct fuji_compressed_params *params, int cur_line);
-  //void fuji_bayer_decode_block (struct fuji_compressed_block *info, const struct fuji_compressed_params *params, int cur_line);
+  void fuji_bayer_decode_block (struct fuji_compressed_block *info, const struct fuji_compressed_params *params, int cur_line);
 
 };
 
