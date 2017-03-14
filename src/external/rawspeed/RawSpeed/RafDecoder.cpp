@@ -129,8 +129,17 @@ void RafDecoder::checkSupportInternal(CameraMetaData *meta) {
 
   string make = data[0]->getEntry(MAKE)->getString();
   string model = data[0]->getEntry(MODEL)->getString();
-  if (!this->checkCameraSupported(meta, make, model, ""))
+
+  if (isComressed()) {
+	mRaw->metadata.mode = "compressed";
+  }
+
+  if (!this->checkCameraSupported(meta, make, model, mRaw->metadata.mode))
      ThrowRDE("RAFDecoder: Unknown camera. Will not guess.");
+
+  const Camera* cam = meta->getCamera(make, model, mRaw->metadata.mode);
+  mRaw->cfa = cam->cfa;
+
 }
 
 void RafDecoder::decodeMetaDataInternal(CameraMetaData *meta) {
@@ -263,5 +272,32 @@ void RafDecoder::decodeMetaDataInternal(CameraMetaData *meta) {
   }
 }
 
+int RafDecoder::isComressed()
+{
+  vector<TiffIFD*> data = mRootIFD->getIFDsWithTag(FUJI_STRIPOFFSETS);
+  TiffIFD* raw = data[0];
+  uint32 height = 0;
+  uint32 width = 0;
+
+  if (raw->hasEntry(FUJI_RAWIMAGEFULLHEIGHT)) {
+    height = raw->getEntry(FUJI_RAWIMAGEFULLHEIGHT)->getInt();
+    width = raw->getEntry(FUJI_RAWIMAGEFULLWIDTH)->getInt();
+  } else if (raw->hasEntry(IMAGEWIDTH)) {
+    TiffEntry *e = raw->getEntry(IMAGEWIDTH);
+    if (e->count < 2)
+      ThrowRDE("Fuji decoder: Size array too small");
+    height = e->getShort(0);
+    width = e->getShort(1);
+  }
+
+  TiffEntry *counts = raw->getEntry(FUJI_STRIPBYTECOUNTS);
+  int count = counts->getInt();
+  if (count*8/(width*height) < 10) {
+    return 1;
+  } else {
+	return 0;
+  }
+
+}
 
 } // namespace RawSpeed

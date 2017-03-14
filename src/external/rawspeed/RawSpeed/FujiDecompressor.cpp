@@ -27,12 +27,14 @@ it under the terms of the one of three licenses as you choose:
 namespace RawSpeed {
 
 // hardcoded X-T2 CFA
+/*
 int xtrans_abs[6][6] = {{1,1,0,1,1,2},
                         {1,1,2,1,1,0},
                         {2,0,1,0,2,1},
                         {1,1,2,1,1,0},
                         {1,1,0,1,1,2},
                         {0,2,1,2,0,1}};
+*/
 
 FujiDecompressor::FujiDecompressor(FileMap* file, RawImage img, int offset ) :
 		mFile(file), mImg(img)
@@ -217,8 +219,8 @@ void FujiDecompressor::copy_line_to_xtrans (struct fuji_compressed_block* info, 
     while (row_count < 6) {
         pixel_count = 0;
         while (pixel_count < cur_block_width) {
-            switch (xtrans_abs[row_count][ (pixel_count % 6)]) {
-//            switch (mImg->cfa.getColorAt(row_count, pixel_count)) {
+//            switch (xtrans_abs[row_count][ (pixel_count % 6)]) {
+            switch (mImg->cfa.getColorAt(pixel_count, row_count)) {
                 case CFA_RED:     // red
                     line_buf = lineBufR[row_count >> 1];
                     break;
